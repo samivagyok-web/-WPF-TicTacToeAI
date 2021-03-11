@@ -28,12 +28,14 @@ namespace Tic_Tac_Toe
         /// <summary>
         /// True if Player 1's turn (X), False if Player 2's turn (O)
         /// </summary>
-        private bool player1Turn;
+        private bool winnerFound;
 
         /// <summary>
         /// True if the game has ended
         /// </summary>
         private bool gameEnded;
+
+        private List<int> openSquares = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
         #region Constructor
         public MainWindow()
@@ -50,13 +52,14 @@ namespace Tic_Tac_Toe
             for (var i = 0; i < 9; i++)
                 results[i] = 0;
 
-            player1Turn = true;
-
             Container.Children.Cast<Button>().ToList().ForEach(button =>
             {
                 button.Content = string.Empty;
                 button.Background = Brushes.White;
                 button.Foreground = Brushes.Blue;
+
+                openSquares = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+                winnerFound = false;
             });
 
             gameEnded = false;
@@ -82,16 +85,69 @@ namespace Tic_Tac_Toe
             if (results[index] != MarkType.Empty) 
                 return;
 
-            results[index] = player1Turn ? MarkType.X : MarkType.O;
-
-            button.Content = player1Turn ? "X" : "O";
-
-            if (!player1Turn)
-                button.Foreground = Brushes.Red;
-
-            player1Turn ^= true;
+            results[index] = MarkType.X;
+            button.Content = "X";
+            openSquares.Remove(index);
 
             checkForWinner();
+
+            if (!winnerFound)
+                AIturn();
+        }
+
+        private void AIturn()
+        {
+            if (openSquares.Count != 0)
+            {
+                Random rnd = new Random();
+                int aiSquare = rnd.Next(0, openSquares.Count);
+                results[openSquares[aiSquare]] = MarkType.O;
+
+                switch (openSquares[aiSquare])
+                {
+                    case 0:
+                        Button0_0.Content = "O";
+                        Button0_0.Foreground = Brushes.Red;
+                        break;
+                    case 1:
+                        Button1_0.Content = "O";
+                        Button1_0.Foreground = Brushes.Red;
+                        break;
+                    case 2:
+                        Button2_0.Content = "O";
+                        Button2_0.Foreground = Brushes.Red;
+                        break;
+                    case 3:
+                        Button0_1.Content = "O";
+                        Button0_1.Foreground = Brushes.Red;
+                        break;
+                    case 4:
+                        Button1_1.Content = "O";
+                        Button1_1.Foreground = Brushes.Red;
+                        break;
+                    case 5:
+                        Button2_1.Content = "O";
+                        Button2_1.Foreground = Brushes.Red;
+                        break;
+                    case 6:
+                        Button0_2.Content = "O";
+                        Button0_2.Foreground = Brushes.Red;
+                        break;
+                    case 7:
+                        Button1_2.Content = "O";
+                        Button1_2.Foreground = Brushes.Red;
+                        break;
+                    case 8:
+                        Button2_2.Content = "O";
+                        Button2_2.Foreground = Brushes.Red;
+                        break;
+                    default:
+                        break;
+                }
+
+                openSquares.RemoveAt(aiSquare);
+                checkForWinner();
+            }
         }
 
         private void checkForWinner()
@@ -102,6 +158,8 @@ namespace Tic_Tac_Toe
             {
                 Button0_0.Background = Button1_0.Background = Button2_0.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
 
             // ROW 2
@@ -109,6 +167,8 @@ namespace Tic_Tac_Toe
             {
                 Button0_1.Background = Button1_1.Background = Button2_1.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
 
             // ROW 3
@@ -116,6 +176,8 @@ namespace Tic_Tac_Toe
             {
                 Button0_2.Background = Button1_2.Background = Button2_2.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
             #endregion
 
@@ -125,6 +187,8 @@ namespace Tic_Tac_Toe
             {
                 Button0_0.Background = Button0_1.Background = Button0_2.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
 
             // COL 2
@@ -132,6 +196,8 @@ namespace Tic_Tac_Toe
             {
                 Button1_0.Background = Button1_1.Background = Button1_2.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
 
             // COL 3
@@ -139,6 +205,8 @@ namespace Tic_Tac_Toe
             {
                 Button2_0.Background = Button2_1.Background = Button2_2.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
             #endregion
 
@@ -148,6 +216,8 @@ namespace Tic_Tac_Toe
             {
                 Button0_0.Background = Button1_1.Background = Button2_2.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
 
             // DIAGONAL 2
@@ -155,6 +225,8 @@ namespace Tic_Tac_Toe
             {
                 Button0_2.Background = Button1_1.Background = Button2_0.Background = Brushes.Green;
                 gameEnded = true;
+                winnerFound = true;
+                return;
             }
             #endregion
 
