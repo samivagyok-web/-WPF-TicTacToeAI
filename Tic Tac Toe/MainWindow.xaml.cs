@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace Tic_Tac_Toe
 {
@@ -23,7 +16,7 @@ namespace Tic_Tac_Toe
         /// <summary>
         /// Holds the value of the cells of the game
         /// </summary>
-        private MarkType[] results;
+        private MarkType[,] results;
 
         /// <summary>
         /// True if Player 1's turn (X), False if Player 2's turn (O)
@@ -41,16 +34,16 @@ namespace Tic_Tac_Toe
         public MainWindow()
         {
             InitializeComponent();
-
             NewGame();
         }
 
         private void NewGame()
         {
-            results = new MarkType[9];
+            results = new MarkType[3,3];
 
-            for (var i = 0; i < 9; i++)
-                results[i] = 0;
+            for (var i = 0; i < 3; i++)
+                for (var j = 0; j < 3; j++)
+                    results[i, j] = 0;
 
             Container.Children.Cast<Button>().ToList().ForEach(button =>
             {
@@ -82,10 +75,10 @@ namespace Tic_Tac_Toe
 
             var index = column + (row * 3);
 
-            if (results[index] != MarkType.Empty) 
+            if (results[row, column] != MarkType.Empty) 
                 return;
 
-            results[index] = MarkType.X;
+            results[row, column] = MarkType.X;
             button.Content = "X";
             openSquares.Remove(index);
 
@@ -94,6 +87,15 @@ namespace Tic_Tac_Toe
             if (!winnerFound)
                 AIturn();
         }
+        public int minimax(MarkType[] results, int depth, bool isMaximizing)
+        {
+            if (winnerFound)
+            {
+
+            }
+
+            return 1;
+        }
 
         private void AIturn()
         {
@@ -101,7 +103,9 @@ namespace Tic_Tac_Toe
             {
                 Random rnd = new Random();
                 int aiSquare = rnd.Next(0, openSquares.Count);
-                results[openSquares[aiSquare]] = MarkType.O;
+                int value = openSquares[aiSquare];
+
+                results[value / 3, value - (3 * (value / 3))] = MarkType.O;
 
                 switch (openSquares[aiSquare])
                 {
@@ -154,7 +158,8 @@ namespace Tic_Tac_Toe
         {
             #region Row Wins
             // ROW 1
-            if (results[0] != MarkType.Empty && (results[0] & results[1] & results[2]) == results[0])
+
+            if (results[0, 0] != MarkType.Empty && (results[0, 0] & results[0, 1] & results[0, 2]) == results[0, 0])
             {
                 Button0_0.Background = Button1_0.Background = Button2_0.Background = Brushes.Green;
                 gameEnded = true;
@@ -163,7 +168,7 @@ namespace Tic_Tac_Toe
             }
 
             // ROW 2
-            if (results[3] != MarkType.Empty && (results[3] & results[4] & results[5]) == results[3])
+            if (results[1, 0] != MarkType.Empty && (results[1, 0] & results[1, 1] & results[1, 2]) == results[1, 0])
             {
                 Button0_1.Background = Button1_1.Background = Button2_1.Background = Brushes.Green;
                 gameEnded = true;
@@ -172,7 +177,7 @@ namespace Tic_Tac_Toe
             }
 
             // ROW 3
-            if (results[6] != MarkType.Empty && (results[6] & results[7] & results[8]) == results[6])
+            if (results[2, 0] != MarkType.Empty && (results[2, 0] & results[2, 1] & results[2, 2]) == results[2, 0])
             {
                 Button0_2.Background = Button1_2.Background = Button2_2.Background = Brushes.Green;
                 gameEnded = true;
@@ -183,7 +188,7 @@ namespace Tic_Tac_Toe
 
             #region Col Wins
             // COL 1
-            if (results[0] != MarkType.Empty && (results[0] & results[3] & results[6]) == results[0])
+            if (results[0, 0] != MarkType.Empty && (results[0, 0] & results[1, 0] & results[2, 0]) == results[0, 0])
             {
                 Button0_0.Background = Button0_1.Background = Button0_2.Background = Brushes.Green;
                 gameEnded = true;
@@ -192,7 +197,7 @@ namespace Tic_Tac_Toe
             }
 
             // COL 2
-            if (results[1] != MarkType.Empty && (results[1] & results[4] & results[7]) == results[1])
+            if (results[0, 1] != MarkType.Empty && (results[0, 1] & results[1, 1] & results[2, 1]) == results[0, 1])
             {
                 Button1_0.Background = Button1_1.Background = Button1_2.Background = Brushes.Green;
                 gameEnded = true;
@@ -201,7 +206,7 @@ namespace Tic_Tac_Toe
             }
 
             // COL 3
-            if (results[2] != MarkType.Empty && (results[2] & results[5] & results[8]) == results[2])
+            if (results[0, 2] != MarkType.Empty && (results[0, 2] & results[1, 2] & results[2, 2]) == results[0, 2])
             {
                 Button2_0.Background = Button2_1.Background = Button2_2.Background = Brushes.Green;
                 gameEnded = true;
@@ -212,7 +217,7 @@ namespace Tic_Tac_Toe
 
             #region Diagonal wins
             // DIAGONAL 1
-            if (results[0] != MarkType.Empty && (results[0] & results[4] & results[8]) == results[0])
+            if (results[0, 0] != MarkType.Empty && (results[0, 0] & results[1, 1] & results[2, 2]) == results[0, 0])
             {
                 Button0_0.Background = Button1_1.Background = Button2_2.Background = Brushes.Green;
                 gameEnded = true;
@@ -221,7 +226,7 @@ namespace Tic_Tac_Toe
             }
 
             // DIAGONAL 2
-            if (results[2] != MarkType.Empty && (results[2] & results[4] & results[6]) == results[2])
+            if (results[0, 2] != MarkType.Empty && (results[0, 2] & results[1, 1] & results[2, 0]) == results[0, 2])
             {
                 Button0_2.Background = Button1_1.Background = Button2_0.Background = Brushes.Green;
                 gameEnded = true;
@@ -231,7 +236,16 @@ namespace Tic_Tac_Toe
             #endregion
 
             #region No winner
-            if (!results.Any(result => result == MarkType.Empty))
+            int counter = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (results[i, j] != MarkType.Empty) counter++;                    
+                }
+            }
+
+            if (counter == 9)
             {
                 gameEnded = true;
 
