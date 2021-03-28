@@ -13,6 +13,7 @@ namespace Tic_Tac_Toe
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Private members
         /// <summary>
         /// Holds the value of the cells of the game
         /// </summary>
@@ -29,6 +30,8 @@ namespace Tic_Tac_Toe
         private bool gameEnded;
 
         private List<int> openSquares = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+
+        #endregion
 
         #region Constructor
         public MainWindow()
@@ -60,6 +63,7 @@ namespace Tic_Tac_Toe
 
         #endregion
 
+        #region Clicks
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (gameEnded)
@@ -87,7 +91,9 @@ namespace Tic_Tac_Toe
             if (!winnerFound)
                 AIturn();
         }
-        public int minimax(MarkType[] results, int depth, bool isMaximizing)
+        #endregion
+
+        public int minimax(MarkType[,] results)
         {
             if (winnerFound)
             {
@@ -97,6 +103,7 @@ namespace Tic_Tac_Toe
             return 1;
         }
 
+        #region AI decision logic and frontend
         private void AIturn()
         {
             if (openSquares.Count != 0)
@@ -148,12 +155,16 @@ namespace Tic_Tac_Toe
                     default:
                         break;
                 }
-
                 openSquares.RemoveAt(aiSquare);
                 checkForWinner();
             }
         }
+        #endregion
 
+        #region Wincon
+        /// <summary>
+        /// Checks for winning conditions
+        /// </summary>
         private void checkForWinner()
         {
             #region Row Wins
@@ -236,16 +247,7 @@ namespace Tic_Tac_Toe
             #endregion
 
             #region No winner
-            int counter = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (results[i, j] != MarkType.Empty) counter++;                    
-                }
-            }
-
-            if (counter == 9)
+            if (results.Cast<MarkType>().All(element => element != MarkType.Empty))
             {
                 gameEnded = true;
 
@@ -256,5 +258,7 @@ namespace Tic_Tac_Toe
             }
             #endregion
         }
+
+        #endregion
     }
 }
