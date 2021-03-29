@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tic_Tac_Toe
+namespace test
 {
-    public enum scores
+    public enum MarkType
     {
-        O =-1,
-        X = 1,
-        Tie = 0
+        Empty,
+        X,
+        O
     }
 }

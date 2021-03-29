@@ -31,6 +31,7 @@ namespace Tic_Tac_Toe
 
         private List<int> openSquares = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
+        private Tuple<int, int> Choice = new Tuple<int, int>(-1, -1);
         #endregion
 
         #region Constructor
@@ -39,6 +40,8 @@ namespace Tic_Tac_Toe
             InitializeComponent();
             NewGame();
         }
+
+        #endregion
 
         private void NewGame()
         {
@@ -59,9 +62,10 @@ namespace Tic_Tac_Toe
             });
 
             gameEnded = false;
-        }
 
-        #endregion
+            AIturn();
+        }
+       
 
         #region Clicks
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -82,81 +86,170 @@ namespace Tic_Tac_Toe
             if (results[row, column] != MarkType.Empty) 
                 return;
 
-            results[row, column] = MarkType.X;
-            button.Content = "X";
+            results[row, column] = MarkType.O;
+            button.Content = "O";
             openSquares.Remove(index);
 
-            checkForWinner();
+            checkForWinner(false, results);
 
             if (!winnerFound)
                 AIturn();
         }
         #endregion
 
-        public int minimax(MarkType[,] results)
-        {
-            if (winnerFound)
-            {
+        #region Minimax
 
+        public int minimax(MarkType[,] res, bool playerComputer)
+        {
+            var result = checkForWinner(true, res);
+            if (result != MarkType.Empty)
+            {
+                if (result == MarkType.X)
+                    return 10;
+                else
+                    return -10;
             }
 
-            return 1;
+            if (playerComputer)
+            {
+                var bestScore = int.MinValue;
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (res[i, j] == MarkType.Empty)
+                        {
+                            res[i, j] = MarkType.X;
+                            var score = minimax(res, false);
+                            res[i, j] = MarkType.Empty;
+
+                            if (score > bestScore)
+                            {
+                                bestScore = score;
+                                Choice = new Tuple<int, int>(i, j);
+                            }
+                        }
+                    }
+                }
+                return bestScore;
+            }
+            else
+            {
+                var bestScore = int.MaxValue;
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (res[i, j] == MarkType.Empty)
+                        {
+                            res[i, j] = MarkType.O;
+                            var score = minimax(res, true);
+                            res[i, j] = MarkType.Empty;
+
+                            if (score < bestScore)
+                            {
+                                bestScore = score;
+                                Choice = new Tuple<int, int>(i, j);
+                            }
+                        }
+                    }
+                }
+                return bestScore;
+            }
         }
+
+        public int returnScore(MarkType[,] res)
+        {
+            MarkType check = checkForWinner(true, res);
+
+            if (check == MarkType.X)
+                return 10;
+            if (check == MarkType.O)
+                return -10;
+            else
+                return 0;
+        }
+
+
+
+        #endregion
+
 
         #region AI decision logic and frontend
         private void AIturn()
         {
             if (openSquares.Count != 0)
             {
-                Random rnd = new Random();
-                int aiSquare = rnd.Next(0, openSquares.Count);
-                int value = openSquares[aiSquare];
 
-                results[value / 3, value - (3 * (value / 3))] = MarkType.O;
+                var bestScore = int.MinValue;
+                int[] move = new int[2];
 
-                switch (openSquares[aiSquare])
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        if (results[i, j] == MarkType.Empty)
+                        {
+                            results[i, j] = MarkType.X;
+                            var score = minimax(results, false);
+                            results[i, j] = MarkType.Empty;
+                                
+                            if (score > bestScore)
+                            {
+                                bestScore = score;
+                                move[0] = i;
+                                move[1] = j;
+                            }
+                        }
+                    }
+                }
+
+                int val = move[0] * 3 + move[1];
+                results[move[0], move[1]] = MarkType.X;
+
+                switch (val)
                 {
                     case 0:
-                        Button0_0.Content = "O";
+                        Button0_0.Content = "X";
                         Button0_0.Foreground = Brushes.Red;
                         break;
                     case 1:
-                        Button1_0.Content = "O";
+                        Button1_0.Content = "X";
                         Button1_0.Foreground = Brushes.Red;
                         break;
                     case 2:
-                        Button2_0.Content = "O";
+                        Button2_0.Content = "X";
                         Button2_0.Foreground = Brushes.Red;
                         break;
                     case 3:
-                        Button0_1.Content = "O";
+                        Button0_1.Content = "X";
                         Button0_1.Foreground = Brushes.Red;
                         break;
                     case 4:
-                        Button1_1.Content = "O";
+                        Button1_1.Content = "X";
                         Button1_1.Foreground = Brushes.Red;
                         break;
                     case 5:
-                        Button2_1.Content = "O";
+                        Button2_1.Content = "X";
                         Button2_1.Foreground = Brushes.Red;
                         break;
                     case 6:
-                        Button0_2.Content = "O";
+                        Button0_2.Content = "X";
                         Button0_2.Foreground = Brushes.Red;
                         break;
                     case 7:
-                        Button1_2.Content = "O";
+                        Button1_2.Content = "X";
                         Button1_2.Foreground = Brushes.Red;
                         break;
                     case 8:
-                        Button2_2.Content = "O";
+                        Button2_2.Content = "X";
                         Button2_2.Foreground = Brushes.Red;
                         break;
                     default:
                         break;
                 }
-                openSquares.RemoveAt(aiSquare);
-                checkForWinner();
+            //    openSquares.RemoveAt(aiSquare);
+                checkForWinner(false, results);
             }
         }
         #endregion
@@ -165,98 +258,161 @@ namespace Tic_Tac_Toe
         /// <summary>
         /// Checks for winning conditions
         /// </summary>
-        private void checkForWinner()
+        private MarkType checkForWinner(bool minimax, MarkType[,] res)
         {
             #region Row Wins
             // ROW 1
 
-            if (results[0, 0] != MarkType.Empty && (results[0, 0] & results[0, 1] & results[0, 2]) == results[0, 0])
+            if (res[0, 0] != MarkType.Empty && (res[0, 0] & res[0, 1] & res[0, 2]) == res[0, 0])
             {
-                Button0_0.Background = Button1_0.Background = Button2_0.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+                if (minimax)
+                {
+                    return res[0, 0];
+                }
+                else
+                {
+                    Button0_0.Background = Button1_0.Background = Button2_0.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
 
             // ROW 2
-            if (results[1, 0] != MarkType.Empty && (results[1, 0] & results[1, 1] & results[1, 2]) == results[1, 0])
+            if (res[1, 0] != MarkType.Empty && (res[1, 0] & res[1, 1] & res[1, 2]) == res[1, 0])
             {
-                Button0_1.Background = Button1_1.Background = Button2_1.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+                if (minimax)
+                {
+                    return res[1, 0];
+                }
+                else
+                {
+                    Button0_1.Background = Button1_1.Background = Button2_1.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
 
             // ROW 3
-            if (results[2, 0] != MarkType.Empty && (results[2, 0] & results[2, 1] & results[2, 2]) == results[2, 0])
+            if (res[2, 0] != MarkType.Empty && (res[2, 0] & res[2, 1] & res[2, 2]) == res[2, 0])
             {
-                Button0_2.Background = Button1_2.Background = Button2_2.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+                if (minimax)
+                {
+                    return res[2, 0];
+                }
+                else
+                {
+                    Button0_2.Background = Button1_2.Background = Button2_2.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
             #endregion
 
             #region Col Wins
             // COL 1
-            if (results[0, 0] != MarkType.Empty && (results[0, 0] & results[1, 0] & results[2, 0]) == results[0, 0])
+            if (res[0, 0] != MarkType.Empty && (res[0, 0] & res[1, 0] & res[2, 0]) == res[0, 0])
             {
-                Button0_0.Background = Button0_1.Background = Button0_2.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+                if (minimax)
+                {
+                    return res[0, 0];
+                }
+                else
+                {
+                    Button0_0.Background = Button0_1.Background = Button0_2.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
 
             // COL 2
-            if (results[0, 1] != MarkType.Empty && (results[0, 1] & results[1, 1] & results[2, 1]) == results[0, 1])
+            if (res[0, 1] != MarkType.Empty && (res[0, 1] & res[1, 1] & res[2, 1]) == res[0, 1])
             {
-                Button1_0.Background = Button1_1.Background = Button1_2.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+                if (minimax)
+                {
+                    
+                    return res[0, 1];
+                }
+                else
+                {
+                    Button1_0.Background = Button1_1.Background = Button1_2.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
 
             // COL 3
-            if (results[0, 2] != MarkType.Empty && (results[0, 2] & results[1, 2] & results[2, 2]) == results[0, 2])
+            if (res[0, 2] != MarkType.Empty && (res[0, 2] & res[1, 2] & res[2, 2]) == res[0, 2])
             {
-                Button2_0.Background = Button2_1.Background = Button2_2.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+                if (minimax)
+                {
+                    return res[0, 2];
+                }
+                else
+                {
+                    Button2_0.Background = Button2_1.Background = Button2_2.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
             #endregion
 
             #region Diagonal wins
             // DIAGONAL 1
-            if (results[0, 0] != MarkType.Empty && (results[0, 0] & results[1, 1] & results[2, 2]) == results[0, 0])
+            if (res[0, 0] != MarkType.Empty && (res[0, 0] & res[1, 1] & res[2, 2]) == res[0, 0])
             {
-                Button0_0.Background = Button1_1.Background = Button2_2.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+                if (minimax)
+                {
+                    return res[0, 0];
+                }
+                else
+                {
+                    Button0_0.Background = Button1_1.Background = Button2_2.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
 
             // DIAGONAL 2
-            if (results[0, 2] != MarkType.Empty && (results[0, 2] & results[1, 1] & results[2, 0]) == results[0, 2])
+            if (res[0, 2] != MarkType.Empty && (res[0, 2] & res[1, 1] & res[2, 0]) == res[0, 2])
             {
-                Button0_2.Background = Button1_1.Background = Button2_0.Background = Brushes.Green;
-                gameEnded = true;
-                winnerFound = true;
-                return;
+
+                if (minimax)
+                    return res[0, 2];
+                else
+                {
+                    Button0_2.Background = Button1_1.Background = Button2_0.Background = Brushes.Green;
+                    gameEnded = true;
+                    winnerFound = true;
+                    return MarkType.Empty;
+                }
             }
             #endregion
 
             #region No winner
-            if (results.Cast<MarkType>().All(element => element != MarkType.Empty))
+            if (res.Cast<MarkType>().All(element => element != MarkType.Empty))
             {
-                gameEnded = true;
-
-                Container.Children.Cast<Button>().ToList().ForEach(button =>
+                if (!minimax)
                 {
-                    button.Background = Brushes.Orange;
-                });
+                    gameEnded = true;
+
+                    Container.Children.Cast<Button>().ToList().ForEach(button =>
+                    {
+                        button.Background = Brushes.Orange;
+                    });
+                }
+                else
+                    return MarkType.Empty;
             }
             #endregion
+
+            return MarkType.Empty;
         }
 
         #endregion
