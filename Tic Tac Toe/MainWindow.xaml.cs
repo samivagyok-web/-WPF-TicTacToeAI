@@ -29,9 +29,7 @@ namespace Tic_Tac_Toe
         /// </summary>
         private bool gameEnded;
 
-        private List<int> openSquares = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
-        private Tuple<int, int> Choice = new Tuple<int, int>(-1, -1);
         #endregion
 
         #region Constructor
@@ -57,7 +55,6 @@ namespace Tic_Tac_Toe
                 button.Background = Brushes.White;
                 button.Foreground = Brushes.Blue;
 
-                openSquares = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
                 winnerFound = false;
             });
 
@@ -88,7 +85,6 @@ namespace Tic_Tac_Toe
 
             results[row, column] = MarkType.O;
             button.Content = "O";
-            openSquares.Remove(index);
 
             checkForWinner(false, results);
 
@@ -126,7 +122,6 @@ namespace Tic_Tac_Toe
                             if (score > bestScore)
                             {
                                 bestScore = score;
-                                Choice = new Tuple<int, int>(i, j);
                             }
                         }
                     }
@@ -149,7 +144,6 @@ namespace Tic_Tac_Toe
                             if (score < bestScore)
                             {
                                 bestScore = score;
-                                Choice = new Tuple<int, int>(i, j);
                             }
                         }
                     }
@@ -178,80 +172,76 @@ namespace Tic_Tac_Toe
         #region AI decision logic and frontend
         private void AIturn()
         {
-            if (openSquares.Count != 0)
+            int[] move = new int[2];
+            var bestScore = int.MinValue;
+
+            for (int i = 0; i < 3; i++)
             {
-
-                var bestScore = int.MinValue;
-                int[] move = new int[2];
-
-                for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
                 {
-                    for (int j = 0; j < 3; j++)
+                    if (results[i, j] == MarkType.Empty)
                     {
-                        if (results[i, j] == MarkType.Empty)
+                        results[i, j] = MarkType.X;
+                        var score = minimax(results, false);
+                        results[i, j] = MarkType.Empty;
+                            
+                        if (score > bestScore)
                         {
-                            results[i, j] = MarkType.X;
-                            var score = minimax(results, false);
-                            results[i, j] = MarkType.Empty;
-                                
-                            if (score > bestScore)
-                            {
-                                bestScore = score;
-                                move[0] = i;
-                                move[1] = j;
-                            }
+                            bestScore = score;
+                            move[0] = i;
+                            move[1] = j;
                         }
                     }
                 }
-
-                int val = move[0] * 3 + move[1];
-                results[move[0], move[1]] = MarkType.X;
-
-                switch (val)
-                {
-                    case 0:
-                        Button0_0.Content = "X";
-                        Button0_0.Foreground = Brushes.Red;
-                        break;
-                    case 1:
-                        Button1_0.Content = "X";
-                        Button1_0.Foreground = Brushes.Red;
-                        break;
-                    case 2:
-                        Button2_0.Content = "X";
-                        Button2_0.Foreground = Brushes.Red;
-                        break;
-                    case 3:
-                        Button0_1.Content = "X";
-                        Button0_1.Foreground = Brushes.Red;
-                        break;
-                    case 4:
-                        Button1_1.Content = "X";
-                        Button1_1.Foreground = Brushes.Red;
-                        break;
-                    case 5:
-                        Button2_1.Content = "X";
-                        Button2_1.Foreground = Brushes.Red;
-                        break;
-                    case 6:
-                        Button0_2.Content = "X";
-                        Button0_2.Foreground = Brushes.Red;
-                        break;
-                    case 7:
-                        Button1_2.Content = "X";
-                        Button1_2.Foreground = Brushes.Red;
-                        break;
-                    case 8:
-                        Button2_2.Content = "X";
-                        Button2_2.Foreground = Brushes.Red;
-                        break;
-                    default:
-                        break;
-                }
-            //    openSquares.RemoveAt(aiSquare);
-                checkForWinner(false, results);
             }
+
+            int val = move[0] * 3 + move[1];
+            results[move[0], move[1]] = MarkType.X;
+
+            switch (val)
+            {
+                case 0:
+                    Button0_0.Content = "X";
+                    Button0_0.Foreground = Brushes.Red;
+                    break;
+                case 1:
+                    Button1_0.Content = "X";
+                    Button1_0.Foreground = Brushes.Red;
+                    break;
+                case 2:
+                    Button2_0.Content = "X";
+                    Button2_0.Foreground = Brushes.Red;
+                    break;
+                case 3:
+                    Button0_1.Content = "X";
+                    Button0_1.Foreground = Brushes.Red;
+                    break;
+                case 4:
+                    Button1_1.Content = "X";
+                    Button1_1.Foreground = Brushes.Red;
+                    break;
+                case 5:
+                    Button2_1.Content = "X";
+                    Button2_1.Foreground = Brushes.Red;
+                    break;
+                case 6:
+                    Button0_2.Content = "X";
+                    Button0_2.Foreground = Brushes.Red;
+                    break;
+                case 7:
+                    Button1_2.Content = "X";
+                    Button1_2.Foreground = Brushes.Red;
+                    break;
+                case 8:
+                    Button2_2.Content = "X";
+                    Button2_2.Foreground = Brushes.Red;
+                    break;
+                default:
+                    break;
+            }
+            checkForWinner(false, results);
         }
+        
         #endregion
 
         #region Wincon
